@@ -16,7 +16,8 @@ import javax.persistence.Table;
         @NamedQuery(name = "getAllEmployees", query = "SELECT e FROM Employee AS e ORDER BY e.id DESC"),
         @NamedQuery(name = "getEmployeesCount", query = "SELECT COUNT(e) FROM Employee AS e"),
         @NamedQuery(name = "checkRegisteredCode", query = "SELECT COUNT(e) FROM Employee AS e WHERE e.code = :code"),
-        @NamedQuery(name = "checkLoginCodeAndPassword", query = "SELECT e FROM Employee AS e WHERE e.delete_flag = 0 AND e.code = :code AND e.password = :pass")
+        @NamedQuery(name = "checkLoginCodeAndPassword", query = "SELECT e FROM Employee AS e WHERE e.delete_flag = 0 AND e.code = :code AND e.password = :pass"),
+        @NamedQuery(name = "getEmployeeFromName", query = "SELECT e FROM Employee AS e WHERE e.name = :name")
 })
 @Entity
 public class Employee {
