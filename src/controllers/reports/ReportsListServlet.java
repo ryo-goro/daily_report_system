@@ -37,11 +37,15 @@ public class ReportsListServlet extends HttpServlet {
             throws ServletException, IOException {
         EntityManager em = DBUtil.createEntityManager();
 
-        String name = request.getParameter("name");
-
-        Employee employee = em.createNamedQuery("getEmployeeFromName", Employee.class)
-                .setParameter("name", name)
-                .getSingleResult();
+        int id;
+        Employee employee = null;
+        try {
+            id = Integer.parseInt(request.getParameter("id"));
+            employee = em.createNamedQuery("getEmployeeFromId", Employee.class)
+                    .setParameter("id", id)
+                    .getSingleResult();
+        } catch (Exception e) {
+        }
 
         int page;
         try {
@@ -49,27 +53,25 @@ public class ReportsListServlet extends HttpServlet {
         } catch (Exception e) {
             page = 1;
         }
-        List<Report> reports = em.createNamedQuery("getMyAllReports", Report.class)
-                .setParameter("employee", employee)
-                .setFirstResult(15 * (page - 1))
-                .setMaxResults(15)
-                .getResultList();
 
-        long reports_count = (long) em.createNamedQuery("getMyReportsCount", Long.class)
-                .setParameter("employee", employee)
-                .getSingleResult();
+        if (employee != null) {
+            List<Report> reports = em.createNamedQuery("getMyAllReports", Report.class)
+                    .setParameter("employee", employee)
+                    .setFirstResult(15 * (page - 1))
+                    .setMaxResults(15)
+                    .getResultList();
+
+            long reports_count = (long) em.createNamedQuery("getMyReportsCount", Long.class)
+                    .setParameter("employee", employee)
+                    .getSingleResult();
+
+            request.setAttribute("reports", reports);
+            request.setAttribute("reports_count", reports_count);
+            request.setAttribute("page", page);
+        }
+        request.setAttribute("employee", employee);
 
         em.close();
-
-        request.setAttribute("name", name);
-        request.setAttribute("reports", reports);
-        request.setAttribute("reports_count", reports_count);
-        request.setAttribute("page", page);
-
-        if (request.getSession().getAttribute("flush") != null) {
-            request.setAttribute("flush", request.getSession().getAttribute("flush"));
-            request.getSession().removeAttribute("flush");
-        }
 
         RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/reports/list.jsp");
         rd.forward(request, response);
